@@ -15,9 +15,12 @@ test.describe('Login functionality', () => {
       await loginPage.login(users.valid.username, users.valid.password);
     });
 
-    await test.step('Verify successful login', async () => {
-      const isLoggedIn = await loginPage.isLoggedIn(urls.afterLogin, ui.titleAfterLogin);
-      expect(isLoggedIn).toBe(true);
+    await test.step('Verify login status', async () => {
+      const status = await loginPage.getLoginStatus(urls.afterLogin, ui.titleAfterLogin);
+  
+      expect(status.isOnRightPage).toBe(true);
+      expect(status.titleVisible).toBe(true);
+      expect(status.hasCorrectTitle).toBe(true);
     });
   });
 

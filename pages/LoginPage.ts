@@ -20,24 +20,29 @@ export class LoginPage {
   }
 
  /**
-   * Checks if the user is successfully logged in by:
-   * - Verifying the redirected URL
-   * - Verifying that the expected page title is visible
-   */
-  async isLoggedIn(urlAfterLogin: string, titleAfterLogin: string): Promise<boolean> {
-    const isOnRightPage = this.page.url().includes(urlAfterLogin);
-    const titleLocator = this.page.locator('.title');
+ * Checks the login status by validating:
+ * - The URL redirection
+ * - The visibility of the page title
+ * - The correctness of the title text
+ */
+async getLoginStatus(urlAfterLogin: string, titleAfterLogin: string): Promise<{
+  isOnRightPage: boolean;
+  titleVisible: boolean;
+  hasCorrectTitle: boolean;
+}> {
+  const isOnRightPage = this.page.url().includes(urlAfterLogin);
+  
+  const titleLocator = this.page.locator('.title');
+  const titleVisible = await titleLocator.isVisible();
+  
+  const titleText = await titleLocator.textContent();
+  const hasCorrectTitle = titleText
+    ? titleText.trim().includes(titleAfterLogin)
+    : false;
 
-    const titleVisible = await titleLocator.isVisible();
-    const titleText = await titleLocator.textContent();
-    
-    // Ensure the title text is defined before applying .trim()
-    const hasCorrectTitle = titleText
-      ? titleText.trim().includes(titleAfterLogin)
-      : false;
+  return { isOnRightPage, titleVisible, hasCorrectTitle };
+}
 
-    return isOnRightPage && titleVisible && hasCorrectTitle;
-  }
   
   /**
    * Retrieves the login error message from the UI.
