@@ -1,10 +1,20 @@
-import { Page } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 
 export class LoginPage {
   readonly page: Page;
+  readonly usernameInput: Locator;
+  readonly passwordInput: Locator;
+  readonly loginButton: Locator;
+  readonly errorMessage: Locator;
+  readonly title: Locator;
 
   constructor(page: Page) {
     this.page = page;
+    this.usernameInput = page.locator('#user-name');
+    this.passwordInput = page.locator('#password');
+    this.loginButton = page.locator('#login-button');
+    this.errorMessage = page.locator('[data-test="error"]');
+    this.title = page.locator('.title');
   }
 
   // Navigates to the login page
@@ -12,11 +22,15 @@ export class LoginPage {
     await this.page.goto('/');
   }
 
+  async isAtLoginPage(): Promise<boolean> {
+    return this.loginButton.isVisible();
+  }
+  
   // Fills in login credentials and submits the form
   async login(username: string, password: string) {
-    await this.page.fill('#user-name', username);
-    await this.page.fill('#password', password);
-    await this.page.click('#login-button');
+    await this.usernameInput.fill(username);
+    await this.passwordInput.fill(password);
+    await this.loginButton.click();
   }
 
  /**
@@ -30,12 +44,11 @@ async getLoginStatus(urlAfterLogin: string, titleAfterLogin: string): Promise<{
   titleVisible: boolean;
   hasCorrectTitle: boolean;
 }> {
-  const isOnRightPage = this.page.url().includes(urlAfterLogin);
+  const isOnRightPage = this.page.url().includes(urlAfterLogin); 
+  const titleVisible = await this.title.isVisible();
   
-  const titleLocator = this.page.locator('.title');
-  const titleVisible = await titleLocator.isVisible();
   
-  const titleText = await titleLocator.textContent();
+  const titleText = await this.title.textContent();
   const hasCorrectTitle = titleText
     ? titleText.trim().includes(titleAfterLogin)
     : false;
@@ -49,7 +62,7 @@ async getLoginStatus(urlAfterLogin: string, titleAfterLogin: string): Promise<{
    * Returns an empty string if the error element is not found.
    */
   async getErrorMessage(): Promise<string> {
-    const text = await this.page.locator('[data-test="error"]').textContent();
+    const text = await this.errorMessage.textContent();
     return text ? text.trim() : '';
   }  
 

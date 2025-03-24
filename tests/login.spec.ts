@@ -9,6 +9,7 @@ test.describe('Login functionality', () => {
 
     await test.step('Navigate to login page', async () => {
       await loginPage.goto();
+      expect(await loginPage.isAtLoginPage()).toBe(true);
     });
 
     await test.step('Submit valid credentials', async () => {
