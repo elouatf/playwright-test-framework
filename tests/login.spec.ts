@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { users, urls, ui } from '../config/testConfig';
 
-test.describe('Login functionality', () => {
+test.describe('US-001 - Successful login with valid credentials', () => {
   
   test('should login successfully with valid credentials', async ({ page }) => {
     const loginPage = new LoginPage(page);
